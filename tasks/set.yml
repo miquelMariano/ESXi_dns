@@ -1,0 +1,33 @@
+---
+# tasks file for ESXi_dns
+
+# Parameter "-s" is required even if IP not exist
+- name: Remove actual DNS servers
+  command: "{{ item }}"
+  with_items:
+    - esxcli network ip dns server remove -a -s 1.1.1.1
+
+- name: Add new DNS servers
+  command: "{{ item }}"
+  with_items:
+    - esxcli network ip dns server add -s {{ dns1 }} #Defined on inventory
+    - esxcli network ip dns server add -s {{ dns2 }} #Defined on inventory
+
+- name: Add domain FQDN
+  command: "{{ item }}"
+  with_items:
+    - esxcli network ip dns search add -d {{ domain }} #Defined on inventory
+
+- name: Add domain search
+  command: "{{ item }}"
+  with_items:
+    - esxcli system hostname set --domain={{ domain }} #Defined on inventory
+    - esxcli system hostname set --host={{ inventory_hostname}}
+
+- name: Change hostname
+  command: "{{ item }}"
+  with_items:
+    - esxcli system hostname set --host={{ inventory_hostname}}
+
+
+
