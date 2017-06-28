@@ -11,10 +11,11 @@ No requirements
 Role Variables
 --------------
 
-Is necessary that variables ntp1 & ntp2 has been defined in our inventory file
+Is necessary that variables `dns1`, `dns2` & `domain` has been defined in our inventory file
 
 Example:
 
+```ini
 		[all]
 		servers_group1
 		servers_group2
@@ -33,6 +34,7 @@ Example:
 		dns1='172.25.34.100'
 		dns2='172.25.34.101'
 		domain='corp.ncora.com'
+```
 
 Dependencies
 ------------
@@ -46,30 +48,39 @@ This play is executed when update_mode var is "true" and ensure that role is up 
 
 miquelMariano.ESXi_{{ role }} folder must be exist. If not, the playbook not found role and fails. You shoud make dir manually "mkdir /etc/ansible/my_role"
 
-```
-		- hosts: ansible
- 		  user: root
- 		  tasks:
- 		   - name: Ensure that role are up to date
- 		     command: ansible-galaxy install --force {{ item }}
- 		     with_items:
- 		       - miquelMariano.ESXi_{{ role  }}
- 		     when:
- 		       - update_mode | default(False)
- 		     tags: update
- 		     ignore_errors: yes
+```yaml
+###
+###ESXi_config.yml
+###		
+- hosts: ansible
+  user: root
+  tasks:
+    - name: Ensure that role are up to date
+      command: ansible-galaxy install --force {{ item }}
+      with_items:
+        - miquelMariano.ESXi_{{ role  }}
+      when:
+        - update_mode | default(False)
+      tags: update
+      ignore_errors: yes
 
-		- hosts: "{{ servers }}:!localhost"
-		  user: root
- 		  serial: 15
- 		  roles:
- 		  - role: miquelMariano.ESXi_{{ role }}
+- hosts: "{{ servers }}:!localhost"
+  user: root
+  serial: 1
+  roles:
+   - role: miquelMariano.ESXi_{{ role  }}
+~
+~
+~
+
 ```
 
 Usage
 ------
 
-`ansible-playbook playbooks/ESXi_config.yml -i inventory/ESXi --extra-vars "servers=servers_group1 role=dns update_mode=true" --tags "update|set"
+```ssh
+ansible-playbook playbooks/ESXi_config.yml -i inventory/ESXi --extra-vars "servers=esxi role=dns update_mode=true" --tags "update,set"
+```
 
 
 License
